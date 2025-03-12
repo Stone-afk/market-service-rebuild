@@ -3,6 +3,7 @@ module market-service
 go 1.23.4
 
 require (
+	github.com/ecodeclub/ekit v0.0.9
 	github.com/google/uuid v1.6.0
 	gorm.io/gorm v1.25.12
 )

@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"errors"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -11,13 +12,21 @@ type marketPriceDAO struct {
 }
 
 func (dao *marketPriceDAO) ListMarketPricesByAsset(ctx context.Context, asset string) ([]MarketPrice, error) {
-	//TODO implement me
-	panic("implement me")
+	var marketPrices []MarketPrice
+	err := dao.db.Model(&MarketPrice{}).Find(&marketPrices).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return marketPrices, nil
 }
 
 func (dao *marketPriceDAO) CreateMarketPrices(ctx context.Context, marketPrices []MarketPrice) error {
-	//TODO implement me
-	panic("implement me")
+	result := dao.db.Model(&MarketPrice{}).
+		CreateInBatches(&marketPrices, len(marketPrices))
+	return result.Error
 }
 
 func NewMarketPriceDAO(db *gorm.DB) MarketPriceDAO {

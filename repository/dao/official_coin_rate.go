@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"errors"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -10,14 +11,22 @@ type officialCoinRateDAO struct {
 	db *gorm.DB
 }
 
-func (o officialCoinRateDAO) ListOfficialCoinRatesByAsset(ctx context.Context, asset string) ([]OfficialCoinRate, error) {
-	//TODO implement me
-	panic("implement me")
+func (dao *officialCoinRateDAO) ListOfficialCoinRatesByAsset(ctx context.Context, asset string) ([]OfficialCoinRate, error) {
+	var rates []OfficialCoinRate
+	err := dao.db.Model(&OfficialCoinRate{}).Find(&rates).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return rates, nil
 }
 
-func (o officialCoinRateDAO) CreateOfficialCoinRates(ctx context.Context, officialCoinRates []OfficialCoinRate) error {
-	//TODO implement me
-	panic("implement me")
+func (dao *officialCoinRateDAO) CreateOfficialCoinRates(ctx context.Context, officialCoinRates []OfficialCoinRate) error {
+	result := dao.db.Model(&OfficialCoinRate{}).
+		CreateInBatches(&officialCoinRates, len(officialCoinRates))
+	return result.Error
 }
 
 func NewOfficialCoinRateDAO(db *gorm.DB) OfficialCoinRateDAO {
