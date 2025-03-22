@@ -1,0 +1,18 @@
+http:
+  addr: ":8080"
+
+db:
+  master:
+    dsn: "root:root@tcp(localhost:13316)/market"
+  slave:
+    dsn: "root:root@tcp(localhost:13316)/market"
+
+etcd:
+  endpoints:
+    - "localhost:12379"
+
+grpc:
+  server:
+    port: 8081
+    etcdAddr: "localhost:12379"
+    etcdTTL: 60

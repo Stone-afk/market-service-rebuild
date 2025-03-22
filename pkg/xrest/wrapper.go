@@ -8,7 +8,7 @@ import (
 )
 
 // BS 的意思是，传入的业务逻辑方法可以接受 req 和 sess 两个参数
-func BS[Req any](fn func(ctx *gin.Context, req Req) (any, error)) gin.HandlerFunc {
+func BS[Req, Resp any](fn func(ctx *gin.Context, req Req) (Resp, error)) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req Req
 		// Bind 方法本身会返回 400 的错误
@@ -16,6 +16,7 @@ func BS[Req any](fn func(ctx *gin.Context, req Req) (any, error)) gin.HandlerFun
 			slog.Debug("绑定参数失败", slog.Any("err", err))
 			return
 		}
+		var res Resp
 		res, err := fn(ctx, req)
 
 		if errors.Is(err, ErrNoResponse) {

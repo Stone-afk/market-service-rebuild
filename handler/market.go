@@ -4,12 +4,12 @@ import (
 	"github.com/ecodeclub/ekit/slice"
 	"github.com/gin-gonic/gin"
 	"market-service/domain"
-	validator "market-service/pkg/xrest/validator"
+	"market-service/pkg/xrest"
 	"market-service/service"
 )
 
 type MarketHandler struct {
-	v                   *validator.Validator
+	//v                   *validator.Validator
 	marketPricesSvc     service.MarketPricesService
 	officialCoinRateSvc service.OfficialCoinRateService
 }
@@ -59,11 +59,15 @@ func (h *MarketHandler) GetMarketPrice(ctx *gin.Context, req GetMarketPriceReque
 	}, nil
 }
 
-func NewMarketHandler(v *validator.Validator, marketPricesSvc service.MarketPricesService, officialCoinRateSvc service.OfficialCoinRateService) *MarketHandler {
+func (h *MarketHandler) RegisterRoutes(server *gin.Engine) {
+	g := server.Group("/market")
+	g.POST("/supportAsset", xrest.BS[SupportAssetRequest, SupportAssetResponse](h.GetSupportAsset))
+	g.GET("/price/get", xrest.BS[GetMarketPriceRequest, GetMarketPriceResponse](h.GetMarketPrice))
+}
+
+func NewMarketHandler(marketPricesSvc service.MarketPricesService, officialCoinRateSvc service.OfficialCoinRateService) *MarketHandler {
 	return &MarketHandler{
-		v:                   v,
 		marketPricesSvc:     marketPricesSvc,
 		officialCoinRateSvc: officialCoinRateSvc,
 	}
-
 }
