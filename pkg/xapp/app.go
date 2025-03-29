@@ -1,10 +1,11 @@
 package xapp
 
 import (
-	"github.com/gin-gonic/gin"
+	"market-service/pkg/xgin"
+	"market-service/pkg/xgrpc/server"
 )
 
 type App struct {
 	GRPCServer *server.Server
-	WebServer  *gin.Engine
+	HTTPServer *xgin.Server
 }

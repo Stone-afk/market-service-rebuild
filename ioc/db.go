@@ -7,9 +7,10 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"market-service/pkg/retry"
+	"market-service/repository/dao"
 )
 
-func NewDB(sourceType string) (*gorm.DB, error) {
+func InitDB(sourceType string) *gorm.DB {
 	type Config struct {
 		DSN string `yaml:"dsn"`
 	}
@@ -22,13 +23,16 @@ func NewDB(sourceType string) (*gorm.DB, error) {
 	db, err := retry.Do[*gorm.DB](context.Background(), 10, retryStrategy, func() (*gorm.DB, error) {
 		db, er := gorm.Open(postgres.Open(c.DSN))
 		if er != nil {
-			return nil, fmt.Errorf("failed to connect to database: %w", er)
+			panic(fmt.Errorf("failed to connect to database: %w", er))
 		}
 		return db, nil
 	})
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
-
-	return db, nil
+	err = dao.InitTables(db)
+	if err != nil {
+		panic(err)
+	}
+	return db
 }
